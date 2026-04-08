@@ -1,0 +1,23 @@
+<idea-plugin>
+    <id>com.zmabel.localize.argument.inlay</id>
+    <name>Localize Argument Inlay</name>
+    <vendor>zmabel.com</vendor>
+
+    <description><![CDATA[
+    <p>在 Java / C# 方法调用中，当整数字面量实参命中 JSON 配置中的 <code>sn</code> 时，在参数后内联显示对应 <code>str</code> 文本。JSON 路径可在设置中自定义。</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.declarativeInlayProviderFactory
+                implementation="com.zmabel.localizeinlay.LocalizeInlayHintsProviderFactory"/>
+
+        <applicationConfigurable
+                id="localize.argument.inlay.settings"
+                displayName="Localize Argument Inlay"
+                implementation="com.zmabel.localizeinlay.LocalizeInlayConfigurable"
+                parentId="tools">
+        </applicationConfigurable>
+    </extensions>
+</idea-plugin>
