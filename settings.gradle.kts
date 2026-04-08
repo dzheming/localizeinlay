@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "localize-argument-inlay-plugin"
+rootProject.name = "localizeinlay"
