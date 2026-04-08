@@ -86,7 +86,7 @@ class LocalizeInlayConfigurable : Configurable {
     }
 
     companion object {
-        private const val DEFAULT_PATH = "D:\\zxhj\\zx-design\\4configs\\Config\\gen\\export\\sourcejson\\1_混合文本总表#文本#ConfLocalize.json"
+        private const val DEFAULT_PATH = "ConfLocalize.json"
     }
 }
 

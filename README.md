@@ -148,5 +148,5 @@ localizeinlay/
 ## 联系方式
 
 - 作者：zmabel
-- 邮箱：<your-email@example.com>
-- 项目地址：<https://github.com/zmabel/localize-argument-inlay-plugin>
+- 邮箱：<dzheming@163.com>
+- 项目地址：<https://github.com/dzheming/localizeinlay.git>
