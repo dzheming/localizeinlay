@@ -27,12 +27,16 @@ class LocalizeInlaySettingsState : PersistentStateComponent<LocalizeInlaySetting
         get() = state.jsonPath
         set(value) {
             state.jsonPath = value
+            // 当设置项的值改变时，重新刷新显示
+            SnJsonConfigMatcher.resetCache()
         }
 
     var methodNames: String
         get() = state.methodNames
         set(value) {
             state.methodNames = value
+            // 当设置项的值改变时，重新刷新显示
+            SnJsonConfigMatcher.resetCache()
         }
 
     companion object {

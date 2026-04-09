@@ -157,7 +157,7 @@ object SnJsonConfigMatcher {
         }
     }
     
-    private fun resetCache() {
+    fun resetCache() {
         cachedLastModifiedMillis = Long.MIN_VALUE
         cachedMap = emptyMap()
 
