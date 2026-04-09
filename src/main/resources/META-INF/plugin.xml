@@ -13,6 +13,11 @@
         <codeInsight.declarativeInlayProviderFactory
                 implementation="com.zmabel.localizeinlay.LocalizeInlayHintsProviderFactory"/>
 
+
+        <completion.contributor
+                language="any"
+                implementationClass="com.zmabel.localizeinlay.LocalizeInlayCompletionContributor"/>
+
         <applicationConfigurable
                 id="localize.argument.inlay.settings"
                 displayName="Localize Argument Inlay"

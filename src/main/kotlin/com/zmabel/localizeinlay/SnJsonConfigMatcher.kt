@@ -260,6 +260,15 @@ object SnJsonConfigMatcher {
         val map = loadSnMap()
         return map[normalized]
     }
+    
+    /**
+     * 根据字符串查找匹配的sn值。
+     * 返回一个Map，键是sn，值是对应的str。
+     */
+    fun findSnByString(query: String): Map<String, String> {
+        val map = loadSnMap()
+        return map.filter { (_, value) -> value.contains(query, ignoreCase = true) }
+    }
 
     private fun loadSnMap(): Map<String, String> {
         return try {
