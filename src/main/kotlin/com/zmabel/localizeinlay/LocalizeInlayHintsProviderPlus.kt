@@ -16,8 +16,23 @@ class LocalizeInlayHintsProviderPlus : InlayHintsProvider {
 
     private object Collector : OwnBypassCollector {
         private val integerLiteralRegex = Regex("""^[+-]?\d[\d_]*[uUlL]*$""")
-        private const val LOCAL_UTILS_METHOD = "LocalUtils"
-        private const val GET_STRING_METHOD = "GetString"
+        
+        private fun getMethodPatterns(): List<Regex> {
+            val methodNames = LocalizeInlaySettingsState.getInstance().methodNames
+            return methodNames.split(",").map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .map { method ->
+                    val parts = method.split(".")
+                    if (parts.size == 2) {
+                        val className = parts[0].trim()
+                        val methodName = parts[1].trim()
+                        "$className\\s*\\.\\s*$methodName\\s*\\(".toRegex()
+                    } else {
+                        val methodName = parts[0].trim()
+                        "$methodName\\s*\\(".toRegex()
+                    }
+                }
+        }
 
         override fun collectHintsForFile(file: PsiFile, sink: InlayTreeSink) {
             val text = file.text
@@ -38,9 +53,17 @@ class LocalizeInlayHintsProviderPlus : InlayHintsProvider {
         }
 
         private fun findMethodCallStart(text: String, startIndex: Int): Int {
-            val pattern = "$LOCAL_UTILS_METHOD\\s*\\.\\s*$GET_STRING_METHOD\\s*\\(".toRegex()
-            val match = pattern.find(text, startIndex)
-            return match?.range?.first ?: -1
+            val patterns = getMethodPatterns()
+            var minIndex = Int.MAX_VALUE
+            
+            for (pattern in patterns) {
+                val match = pattern.find(text, startIndex)
+                if (match != null && match.range.first < minIndex) {
+                    minIndex = match.range.first
+                }
+            }
+            
+            return if (minIndex != Int.MAX_VALUE) minIndex else -1
         }
 
         private fun findMethodCallEnd(text: String, startIndex: Int): Int {
@@ -157,8 +180,14 @@ class LocalizeInlayHintsProviderPlus : InlayHintsProvider {
                     processConditionalArgument(text, from, to, sink)
                 }
                 
-                // 检查是否包含嵌套的 LocalUtils.GetString 调用
-                if (text.substring(from, to).contains("$LOCAL_UTILS_METHOD.$GET_STRING_METHOD")) {
+                // 检查是否包含嵌套的方法调用
+                val subText = text.substring(from, to)
+                val patterns = getMethodPatterns()
+                val hasNestedCall = patterns.any { pattern ->
+                    pattern.find(subText) != null
+                }
+                
+                if (hasNestedCall) {
                     var i = from
                     while (i < to) {
                         val methodStart = findMethodCallStart(text, i)

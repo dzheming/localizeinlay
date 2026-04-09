@@ -33,7 +33,8 @@ kotlin {
 dependencies {
     intellijPlatform {
         // Use intellijIdea() for 2025.3+; intellijIdeaCommunity() is only for versions before 2025.3.
-        intellijIdea(providers.gradleProperty("platformVersion").orElse("2024.3.7"))
+        //intellijIdea(providers.gradleProperty("platformVersion").orElse("2024.3.7"))
+        intellijIdeaCommunity(providers.gradleProperty("platformVersion").orElse("2024.3.7"))
     }
 }
 

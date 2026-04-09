@@ -16,7 +16,7 @@
         <applicationConfigurable
                 id="localize.argument.inlay.settings"
                 displayName="Localize Argument Inlay"
-                implementation="com.zmabel.localizeinlay.LocalizeInlayConfigurable"
+                instance="com.zmabel.localizeinlay.LocalizeInlayConfigurable"
                 parentId="tools">
         </applicationConfigurable>
     </extensions>

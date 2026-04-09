@@ -6,12 +6,13 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 
-@State(name = "NumericInlaySettings", storages = [Storage("numeric-inlay.xml")])
+@State(name = "LocalizeInlaySettings", storages = [Storage("localize-inlay.xml")])
 @Service(Service.Level.APP)
 class LocalizeInlaySettingsState : PersistentStateComponent<LocalizeInlaySettingsState.State> {
 
     data class State(
         var jsonPath: String? = null,
+        var methodNames: String = "LocalUtils.GetString",
     )
 
     private var state = State()
@@ -26,6 +27,12 @@ class LocalizeInlaySettingsState : PersistentStateComponent<LocalizeInlaySetting
         get() = state.jsonPath
         set(value) {
             state.jsonPath = value
+        }
+
+    var methodNames: String
+        get() = state.methodNames
+        set(value) {
+            state.methodNames = value
         }
 
     companion object {

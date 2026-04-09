@@ -22,6 +22,7 @@ class LocalizeInlayConfigurable : Configurable {
 
     private var panel: JPanel? = null
     private var pathField: TextFieldWithBrowseButton? = null
+    private var methodNamesField: JBTextField? = null
 
     override fun getDisplayName(): String = "Localize Argument Inlay"
 
@@ -57,6 +58,16 @@ class LocalizeInlayConfigurable : Configurable {
             }
             form.add(pathField, c)
 
+            c.gridx = 0
+            c.gridy = 1
+            c.weightx = 0.0
+            form.add(JLabel("方法名（用逗号分隔）："), c)
+
+            c.gridx = 1
+            c.weightx = 1.0
+            methodNamesField = JBTextField()
+            form.add(methodNamesField, c)
+
             root.add(form, BorderLayout.NORTH)
             panel = root
 
@@ -66,23 +77,29 @@ class LocalizeInlayConfigurable : Configurable {
     }
 
     override fun isModified(): Boolean {
-        val current = LocalizeInlaySettingsState.getInstance().jsonPath ?: ""
-        val ui = pathField?.text ?: ""
-        return current != ui
+        val currentPath = LocalizeInlaySettingsState.getInstance().jsonPath ?: ""
+        val uiPath = pathField?.text ?: ""
+        val currentMethodNames = LocalizeInlaySettingsState.getInstance().methodNames
+        val uiMethodNames = methodNamesField?.text ?: ""
+        return currentPath != uiPath || currentMethodNames != uiMethodNames
     }
 
     override fun apply() {
         LocalizeInlaySettingsState.getInstance().jsonPath = pathField?.text?.trim().takeUnless { it.isNullOrEmpty() }
+        LocalizeInlaySettingsState.getInstance().methodNames = methodNamesField?.text?.trim().takeIf { it?.isNotEmpty() == true } ?: "LocalUtils.GetString"
     }
 
     override fun reset() {
-        val saved = LocalizeInlaySettingsState.getInstance().jsonPath ?: DEFAULT_PATH
-        pathField?.text = saved
+        val savedPath = LocalizeInlaySettingsState.getInstance().jsonPath ?: DEFAULT_PATH
+        pathField?.text = savedPath
+        val savedMethodNames = LocalizeInlaySettingsState.getInstance().methodNames
+        methodNamesField?.text = savedMethodNames
     }
 
     override fun disposeUIResources() {
         panel = null
         pathField = null
+        methodNamesField = null
     }
 
     companion object {
