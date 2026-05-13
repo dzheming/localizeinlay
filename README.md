@@ -11,6 +11,7 @@ Localize Inlay 是一个 IntelliJ IDEA 插件，用于在 Java / C# 方法调用
   - 普通调用：`LocalUtils.GetString(1001)`
   - 嵌套调用：`LocalUtils.GetString(LocalUtils.GetString(1001))`
   - 条件表达式：`LocalUtils.GetString(true ? 1001 : 1002)`
+  - Null Coalescing：`LocalUtils.GetString(mDun?.desc ?? 1444)`
   - 多参数调用：`LocalUtils.GetString(1001, "param", 1002)`
 - **支持多种方法名**：在插件设置中配置多个本地化方法名，用逗号分隔
 - **实时刷新**：当配置文件 JSON 更新时，实时刷新内联提示显示
@@ -81,6 +82,9 @@ String nestedText = LocalUtils.GetString(LocalUtils.GetString(1002));
 // 条件表达式
 String statusText = LocalUtils.GetString(isActive ? 1001 : 1003);
 
+// Null Coalescing
+String defaultText = LocalUtils.GetString(mDun?.desc ?? 1444);
+
 // 多参数调用
 String multiParamText = LocalUtils.GetString(1001, "extra", LocalUtils.GetString(1002));
 ```
@@ -96,6 +100,9 @@ String nestedText = LocalUtils.GetString(LocalUtils.GetString(1002 /* 登录成�
 
 // 条件表达式（显示内联提示）
 String statusText = LocalUtils.GetString(isActive ? 1001 /* 欢迎使用系统 */ : 1003 /* 退出系统 */);
+
+// Null Coalescing（显示内联提示）
+String defaultText = LocalUtils.GetString(mDun?.desc ?? 1444 /* 默认描述 */);
 
 // 多参数调用（显示内联提示）
 String multiParamText = LocalUtils.GetString(1001 /* 欢迎使用系统 */, "extra", LocalUtils.GetString(1002 /* 登录成功 */));

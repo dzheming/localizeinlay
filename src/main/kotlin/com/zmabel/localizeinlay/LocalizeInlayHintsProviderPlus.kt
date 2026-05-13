@@ -261,6 +261,24 @@ class LocalizeInlayHintsProviderPlus : InlayHintsProvider {
             if (left >= right) return null
 
             val raw = text.substring(left, right)
+            
+            // 处理空合并运算符 ??
+            val nullCoalesceIndex = raw.indexOf("??")
+            if (nullCoalesceIndex >= 0) {
+                val defaultValuePart = raw.substring(nullCoalesceIndex + 2)
+                var defaultValueStart = left + nullCoalesceIndex + 2
+                while (defaultValueStart < right && text[defaultValueStart].isWhitespace()) {
+                    defaultValueStart++
+                }
+                val numMatch = Regex("""[+-]?\d[\d_]*[uUlL]*""").find(defaultValuePart)
+                if (numMatch != null) {
+                    // defaultValueStart 已经指向数字起始位置，直接使用
+                    val numEndInText = defaultValueStart + numMatch.value.length
+                    return NumericArg(numEndInText, numMatch.value.replace("_", ""))
+                }
+                return null
+            }
+
             return NumericArg(right, raw.replace(" ", ""))
         }
 
