@@ -16,10 +16,16 @@ class LocalizeInlayHintsProviderPlus : InlayHintsProvider {
 
     private object Collector : OwnBypassCollector {
         private val integerLiteralRegex = Regex("""^[+-]?\d[\d_]*[uUlL]*$""")
+
+        private var cacheMethodNamesKey: String = ""
+        private var cachedPatterns: List<Regex> = emptyList()
         
         private fun getMethodPatterns(): List<Regex> {
             val methodNames = LocalizeInlaySettingsState.getInstance().methodNames
-            return methodNames.split(",").map { it.trim() }
+            if (methodNames == cacheMethodNamesKey && cachedPatterns.isNotEmpty()) {
+                return cachedPatterns
+            }
+            val patterns = methodNames.split(",").map { it.trim() }
                 .filter { it.isNotEmpty() }
                 .map { method ->
                     val parts = method.split(".")
@@ -32,6 +38,9 @@ class LocalizeInlayHintsProviderPlus : InlayHintsProvider {
                         "$methodName\\s*\\(".toRegex()
                     }
                 }
+            cacheMethodNamesKey = methodNames
+            cachedPatterns = patterns
+            return patterns
         }
 
         override fun collectHintsForFile(file: PsiFile, sink: InlayTreeSink) {
@@ -176,12 +185,12 @@ class LocalizeInlayHintsProviderPlus : InlayHintsProvider {
                 }
             } else {
                 // 检查是否包含条件表达式
-                if (text.substring(from, to).contains(":")) {
+                val subText = text.substring(from, to)
+                if (subText.contains("?") && subText.contains(":")) {
                     processConditionalArgument(text, from, to, sink)
                 }
                 
                 // 检查是否包含嵌套的方法调用
-                val subText = text.substring(from, to)
                 val patterns = getMethodPatterns()
                 val hasNestedCall = patterns.any { pattern ->
                     pattern.find(subText) != null

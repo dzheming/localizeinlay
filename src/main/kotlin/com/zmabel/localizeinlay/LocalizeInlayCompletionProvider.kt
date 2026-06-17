@@ -18,11 +18,10 @@ class LocalizeInlayCompletionProvider : CompletionProvider<CompletionParameters>
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        val editor = parameters.getEditor() ?: return
+        val editor = parameters.editor
 
-        // 获取当前光标位置的文本
         val caretOffset = editor.caretModel.offset
-        val document = editor.document ?: return
+        val document = editor.document
         val text = document.text
 
         // 查找当前光标前的字符串

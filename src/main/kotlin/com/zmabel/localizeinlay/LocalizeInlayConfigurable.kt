@@ -103,7 +103,7 @@ class LocalizeInlayConfigurable : Configurable {
     }
 
     companion object {
-        private const val DEFAULT_PATH = "ConfLocalize.json"
+        private const val DEFAULT_PATH = SnJsonConfigMatcher.DEFAULT_PATH
     }
 }
 

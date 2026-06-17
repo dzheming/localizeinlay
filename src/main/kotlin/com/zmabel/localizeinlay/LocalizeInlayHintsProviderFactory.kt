@@ -13,13 +13,21 @@ class LocalizeInlayHintsProviderFactory : InlayHintsProviderFactory {
         "Localize Argument Inlay"
     )
 
-    override fun getProviderInfo(language: Language, providerId: String): InlayProviderInfo = providerInfo
+    override fun getProviderInfo(language: Language, providerId: String): InlayProviderInfo? {
+        if (providerId != PROVIDER_ID) return null
+        if (!SUPPORTED_LANGUAGE_IDS.contains(language.id.uppercase())) return null
+        return providerInfo
+    }
 
     override fun getProvidersForLanguage(language: Language): List<InlayProviderInfo> {
         return if (SUPPORTED_LANGUAGE_IDS.contains(language.id.uppercase())) listOf(providerInfo) else emptyList()
     }
 
-    override fun getSupportedLanguages(): Set<Language> = emptySet()
+    override fun getSupportedLanguages(): Set<Language> {
+        return Language.getRegisteredLanguages().filter {
+            SUPPORTED_LANGUAGE_IDS.contains(it.id.uppercase())
+        }.toSet()
+    }
 
     companion object {
         const val PROVIDER_ID: String = "localize.argument.inlay.multi"

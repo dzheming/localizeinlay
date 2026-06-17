@@ -10,13 +10,13 @@ Localize Inlay 是一个 IntelliJ IDEA 插件，用于在 Java / C# 方法调用
 - **支持多种调用形式**：
   - 普通调用：`LocalUtils.GetString(1001)`
   - 嵌套调用：`LocalUtils.GetString(LocalUtils.GetString(1001))`
-  - 条件表达式：`LocalUtils.GetString(true ? 1001 : 1002)`
-  - Null Coalescing：`LocalUtils.GetString(mDun?.desc ?? 1444)`
+  - 三元表达式：`LocalUtils.GetString(true ? 1001 : 1002)`
+  - 空合并运算符：`LocalUtils.GetString(mDun?.desc ?? 1444)`
   - 多参数调用：`LocalUtils.GetString(1001, "param", 1002)`
 - **支持多种方法名**：在插件设置中配置多个本地化方法名，用逗号分隔
-- **实时刷新**：当配置文件 JSON 更新时，实时刷新内联提示显示
-- **设置项实时更新**：当设置项的值改变时，重新刷新内联提示显示
-- **代码补全**：在编辑文件时，如果输入的字符串在 JSON 文件的 str 中有匹配的值，可选择对应的 sn 插入到编辑文本中
+- **实时刷新**：JSON配置文件更新时自动刷新内联提示(VFS监听+WatchService双重监控)
+- **设置项实时更新**：设置项变更时自动刷新提示并切换文件监控路径
+- **代码补全**: 输入文本时反查JSON中的str字段,提供对应sn的补全建议
 - **空格处理**：支持方法名和括号之间的任意空格
 - **JSON 配置**：通过 JSON 文件配置 `sn` 到 `str` 的映射
 - **可自定义配置路径**：在插件设置中自定义 JSON 配置文件路径
@@ -70,42 +70,25 @@ JSON 文件应该包含一个对象数组，每个对象包含 `sn` 和 `str` �
 
 ## 示例
 
-### 输入
-
 ```java
 // 普通调用
 String text = LocalUtils.GetString(1001);
-
+String text = LocalUtils.GetString(1001 /* 欢迎使用系统 */);
 // 嵌套调用
 String nestedText = LocalUtils.GetString(LocalUtils.GetString(1002));
-
-// 条件表达式
+String nestedText = LocalUtils.GetString(LocalUtils.GetString(1002 /* 登录成功 */));
+// 三元表达式
 String statusText = LocalUtils.GetString(isActive ? 1001 : 1003);
-
-// Null Coalescing
-String defaultText = LocalUtils.GetString(mDun?.desc ?? 1444);
-
+String statusText = LocalUtils.GetString(isActive ? 1001 /* 欢迎使用系统 */ : 1003 /* 退出系统 */);
 // 多参数调用
 String multiParamText = LocalUtils.GetString(1001, "extra", LocalUtils.GetString(1002));
+String multiParamText = LocalUtils.GetString(1001 /* 欢迎使用系统 */, "extra", LocalUtils.GetString(1002 /* 登录成功 */));
 ```
 
-### 输出
-
-```java
-// 普通调用（显示内联提示）
-String text = LocalUtils.GetString(1001 /* 欢迎使用系统 */);
-
-// 嵌套调用（显示内联提示）
-String nestedText = LocalUtils.GetString(LocalUtils.GetString(1002 /* 登录成功 */));
-
-// 条件表达式（显示内联提示）
-String statusText = LocalUtils.GetString(isActive ? 1001 /* 欢迎使用系统 */ : 1003 /* 退出系统 */);
-
-// Null Coalescing（显示内联提示）
-String defaultText = LocalUtils.GetString(mDun?.desc ?? 1444 /* 默认描述 */);
-
-// 多参数调用（显示内联提示）
-String multiParamText = LocalUtils.GetString(1001 /* 欢迎使用系统 */, "extra", LocalUtils.GetString(1002 /* 登录成功 */));
+```C++
+// 空合并运算符
+LocalUtils.GetString(mDun?.desc ?? 1444);
+LocalUtils.GetString(mDun?.desc ?? 1444 /* 默认描述 */);
 ```
 
 ## 开发指南
@@ -142,18 +125,15 @@ localizeinlay/
 │   ├── main/
 │   │   ├── kotlin/
 │   │   │   └── com/zmabel/localizeinlay/
-│   │   │       ├── LocalizeInlayConfigurable.kt         # 插件配置界面
-│   │   │       ├── LocalizeInlayHintsProvider.kt        # 核心提示提供者
-│   │   │       ├── LocalizeInlayHintsProviderFactory.kt # 提示提供者工厂
-│   │   │       ├── LocalizeInlayHintsProviderPlus.kt    # 增强版提示提供者
-│   │   │       ├── LocalizeInlaySettingsState.kt        # 设置状态管理
-│   │   │       ├── LocalizeInlayCompletionProvider.kt   # 代码补全提供者
-│   │   │       └── SnJsonConfigMatcher.kt               # JSON 配置匹配器
+│   │   │       ├── LocalizeInlayConfigurable.kt         # 插件设置界面
+│   │   │       ├── LocalizeInlayHintsProviderFactory.kt # 提示提供者工厂,注册支持的语言
+│   │   │       ├── LocalizeInlayHintsProviderPlus.kt    # 核心Inlay提示逻辑
+│   │   │       ├── LocalizeInlaySettingsState.kt        # 持久化设置
+│   │   │       ├── LocalizeInlayCompletionProvider.kt   # 代码补全
+│   │   │       └── SnJsonConfigMatcher.kt               # JSON 配置读取,缓存,文件监控
 │   │   ├── resources/
 │   │   │   ├── META-INF/
 │   │   │   │   └── plugin.xml                           # 插件配置
-│   │   │   └── messages/
-│   │   │       └── LocalizeInlayBundle.properties       # 国际化资源
 ├── build.gradle.kts                                      # 构建脚本
 └── README.md                                             # 项目说明
 ```
