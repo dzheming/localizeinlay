@@ -18,6 +18,9 @@ class LocalizeInlayCompletionProvider : CompletionProvider<CompletionParameters>
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
+        val virtualFile = parameters.originalFile.virtualFile ?: return
+        if (!virtualFile.isInLocalFileSystem) return
+
         val editor = parameters.editor
 
         val caretOffset = editor.caretModel.offset
